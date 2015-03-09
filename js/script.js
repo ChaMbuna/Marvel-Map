@@ -1,3 +1,8 @@
+// Declare global variables
+var MAP
+var CHARACTERPIC
+
+// Character info not provided by the API
 var characterCollection = {
   "3-D Man": {
     "id": 1011334,
@@ -5,6 +10,9 @@ var characterCollection = {
      }
   }
 
+
+
+// ===== MAIN FUNCTION =====
 function loadData() {
   // stores HTML elements to be updated on query
   var $body = $('body');
@@ -13,15 +21,19 @@ function loadData() {
   // clear out old data before new request
   $characterInfo.text("");
   
-  // get value of query
+  // get value of character lookup
   var character = $('#character').val();
   
   // get character birthplace for use in Google Maps
   var characterPOB = characterCollection[character]['birthPlace']
+  
   // get character id for use in Marvel API
   var characterID = characterCollection[character]['id']
 
-// Marvel API
+
+
+  
+  // ===== MARVEL API =====
 var marvelAPIurl = 'http://gateway.marvel.com/v1/public/characters?id=' + characterID + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2'
 var MarvelRequestTimeout = setTimeout(function() {
   
@@ -30,46 +42,54 @@ var MarvelRequestTimeout = setTimeout(function() {
   $.ajax({
     url: marvelAPIurl,
     dataType: 'json',
-    success: function(data) {
-      console.log(data);  
+    success: function(object) {
+      console.log(object);
+      CHARACTERPIC = object.data.results[0].thumbnail.path
+      + '.'
+      + object.data.results[0].thumbnail.extension;
+      console.log(CHARACTERPIC)
       clearTimeout(MarvelRequestTimeout);
     }
 });
-
+  
+  
+  
+  
+  // ===== GOOGLE MAPS GEOCODER =====
   geocoder = new google.maps.Geocoder();  
   geocoder.geocode( { 'address': characterPOB }, function(results, status) {
     if (status == google.maps.GeocoderStatus.OK) {
-      map.setCenter(results[0].geometry.location);
-      var marker = new google.maps.Marker({
-          map: map,
-          position: results[0].geometry.location
-      });
+      MAP.setCenter(results[0].geometry.location);
+      
+      
+  
+      
     } else {
       alert('Geocode was not successful for the following reason: ' + status);
     }
   });
+  console.log(CHARACTERPIC);
+  var image = {
+    url: CHARACTERPIC,
+    size: new google.maps.Size(50, 50),
+    origin: new google.maps.Point(0, 0),
+    anchor: new google.maps.Point(0, 50)
+  };
+  console.log(image)
+  
+  
 
     return false;
    
 };
-    /*$.getJSON(marvelAPIurl, function (data) {
-      console.log(data);
-      $characterInfo.text('Info about ' + character);
-      $characterInfo.css( "display: flex ")
-      MarvelResponse = data.response.docs
-      for (var i = 0; i < articleArray.length; i++) {
-        var article = articleArray[i]
-        $("#nytimes-articles").append('<li class="article"><a href="'+article.web_url+'">'+(article.headline.main)+'</a><p>'+ article.snippet +'</p></li>');
-        };
-      })
-    .error( function() {
-      $nytHeaderElem.text('Articles could not be loaded at this time');*/
 
-
+// loads main function on character lookup
 $('#form-container').submit(loadData);
 
-// Google Maps API for pageload
-// Settings to make the map look Marvel themed
+
+
+// ===== GOOGLE MAPS API=====
+// Styles to make the map look Marvel themed
   var styles = [
   {
     "featureType": "administrative.land_parcel",
@@ -139,6 +159,7 @@ $('#form-container').submit(loadData);
   }
 ];
 
+// Initializes Google Maps
 function initialize() {
   var styledMap = new google.maps.StyledMapType(styles,
     {name: "Styled Map"});
@@ -153,10 +174,11 @@ function initialize() {
   };
   
   // Puts the map in the map canvas div
-  var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+  MAP = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
-  map.mapTypes.set('map_style', styledMap);
-  map.setMapTypeId('map_style');
+  MAP.mapTypes.set('map_style', styledMap);
+  MAP.setMapTypeId('map_style');
+  
     
   }
 
@@ -171,5 +193,6 @@ function loadScript() {
   document.body.appendChild(script);
 }
 
+// Loads initial Google Map when page loads
 window.onload = loadScript;
 
