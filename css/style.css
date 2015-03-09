@@ -1,0 +1,48 @@
+* { margin: 0; }
+html, body, #container { height: 100%; padding: 0;}
+
+
+#container {
+  position: relative;
+}
+
+#header {
+  background-color: grey;
+  padding: 10px;
+}
+
+#character-info {
+  display: none;
+}
+
+#map-canvas {
+  height: calc(100% - 49px);
+}
+
+#character {
+  padding: 5px;
+  width: calc(100% - 118px);
+}
+
+
+#submit-btn {
+ -webkit-border-radius: 2;
+ -moz-border-radius: 2;
+  border-radius: 2px;
+  font-family: Arial;
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 16px;
+  background: #0F6AB4;
+  padding: 2px 20px 2px 20px;
+  text-decoration: none;
+}
+#submit-btn:hover {
+  background: #3cb0fd;
+  background-image: -webkit-linear-gradient(top, #3cb0fd, #0F6AB4);
+  background-image: -moz-linear-gradient(top, #3cb0fd, #0F6AB4);
+  background-image: -ms-linear-gradient(top, #3cb0fd, #0F6AB4);
+  background-image: -o-linear-gradient(top, #3cb0fd, #0F6AB4);
+  background-image: linear-gradient(to bottom, #3cb0fd, #0F6AB4);
+  text-decoration: none;
+}
