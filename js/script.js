@@ -1,14 +1,21 @@
 // Declare global variables
 var MAP
 var CHARACTERPIC
+var CHARACTERNAME
+var CHARACTERDESC
+var CHARACTERWIKI
 
 // Character info not provided by the API
 var characterCollection = {
   "3-D Man": {
     "id": 1011334,
     "birthPlace": "Los Angeles, California"
-     }
+     },
+  "Spider-Man": {
+    "id": 1009610,
+    "birthPlace": "Forest Hills, New York"
   }
+}
 
 
 
@@ -42,12 +49,19 @@ var MarvelRequestTimeout = setTimeout(function() {
   $.ajax({
     url: marvelAPIurl,
     dataType: 'json',
+    async: false,
     success: function(object) {
       console.log(object);
+      if (object.data.results[0].description == "") {
+        CHARACTERDESC = "Bummer, there is no description available for this character."
+      } else {
+        CHARACTERDESC = object.data.results[0].description;
+      }
+      CHARACTERWIKI = object.data.results[0].urls[1].url;
+      CHARACTERNAME = object.data.results[0].name;
       CHARACTERPIC = object.data.results[0].thumbnail.path
       + '.'
       + object.data.results[0].thumbnail.extension;
-      console.log(CHARACTERPIC)
       clearTimeout(MarvelRequestTimeout);
     }
 });
@@ -59,23 +73,46 @@ var MarvelRequestTimeout = setTimeout(function() {
   geocoder = new google.maps.Geocoder();  
   geocoder.geocode( { 'address': characterPOB }, function(results, status) {
     if (status == google.maps.GeocoderStatus.OK) {
+      
       MAP.setCenter(results[0].geometry.location);
       
+      var image = {
+      url: CHARACTERPIC,
+        scaledSize: new google.maps.Size(100, 100),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(50, -20),
+      };
       
-  
+      var marker = new google.maps.Marker({
+        position: results[0].geometry.location,
+        map: MAP,
+        icon: image,
+      });
       
+      var contentString = '<div id="content">'+
+      '<div id="siteNotice">'+
+      '</div>'+
+      '<h1 id="firstHeading" class="firstHeading">' + CHARACTERNAME + '</h1>'+
+      '<div id="bodyContent">'+
+      '<p><b>' + CHARACTERDESC + '</b></p>'+
+      '<p><a href="' + CHARACTERWIKI +'">' +
+      'Check out this character on the Marvel Universe Wikipedia</a></p>'+
+      '</div>'+
+      '</div>';
+
+      var infowindow = new google.maps.InfoWindow({
+        content: contentString
+      });
+      
+      google.maps.event.addListener(marker, 'click', function() {
+        infowindow.open(MAP,marker);
+      });
+          
     } else {
       alert('Geocode was not successful for the following reason: ' + status);
     }
   });
-  console.log(CHARACTERPIC);
-  var image = {
-    url: CHARACTERPIC,
-    size: new google.maps.Size(50, 50),
-    origin: new google.maps.Point(0, 0),
-    anchor: new google.maps.Point(0, 50)
-  };
-  console.log(image)
+  
   
   
 
