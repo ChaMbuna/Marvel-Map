@@ -3,28 +3,27 @@
   <head>
     <title>Simple Map</title>
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link href='http://fonts.googleapis.com/css?family=Russo+One' rel='stylesheet' type='text/css'>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
   </head>
   <body>
     <div id="container">
-      <div id="header">
+      <div id="titlebar">Find out where Marvel heroes are born!</div>
+      <div id="header">  
         <form id="form-container">
           <input type="text" id="character" value="" placeholder="What character do you want to look up?">
           <input type="submit" id="submit-btn" value="Search"></input>
         </form>
       </div>
 
-    <div id="character-info">
-    Character info
-    </div>
-
-    <div id="map-canvas">
-    </div>
+    <div id="map-canvas"></div>
     
 </div>
   <script src="js/libs/jquery.min.js"></script>
+  <script src="js/libs/knockout-3.3.0.js"></script>
   <script src="js/script.js"></script>
+  
   
 </body>
 </html>

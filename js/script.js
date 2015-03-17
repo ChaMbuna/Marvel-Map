@@ -1,11 +1,11 @@
-// Declare global variables
+// Declare global map variable
 var MAP
 var CHARACTERPIC
 var CHARACTERNAME
 var CHARACTERDESC
 var CHARACTERWIKI
 
-// Character info not provided by the API
+// Searchable Characters including info not available in Marvel API
 var characterCollection = {
   "3-D Man": {
     "id": 1011334,
@@ -14,7 +14,31 @@ var characterCollection = {
   "Spider-Man": {
     "id": 1009610,
     "birthPlace": "Forest Hills, New York"
-  }
+  },
+  "Iron Man": {
+    "id": 1009368,
+    "birthPlace": "Long Island, New York"
+     },
+  "Wolverine": {
+    "id": 1009718,
+    "birthPlace": "Alberta, Canada"
+     },
+ "Captain America": {
+    "id": 1009220,
+    "birthPlace": "New York, New York"
+     },
+  "Hulk": {
+    "id": 1009351,
+    "birthPlace": "Dayton, Ohio"
+     },
+ "Black Widow": {
+    "id": 1009189,
+    "birthPlace": "Stalingrad, Russia"
+     },
+  "Red Skull": {
+    "id": 1009535,
+    "birthPlace": "Germany"
+     }
 }
 
 
@@ -23,10 +47,6 @@ var characterCollection = {
 function loadData() {
   // stores HTML elements to be updated on query
   var $body = $('body');
-  var $characterInfo = $('#character-info');
-  
-  // clear out old data before new request
-  $characterInfo.text("");
   
   // get value of character lookup
   var character = $('#character').val();
