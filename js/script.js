@@ -50,14 +50,24 @@ function loadData() {
   
   // get value of character lookup
   var character = $('#character').val();
+    
+  if ($('#character').val() === "") {
+    alert('You didn\'t enter a character name');
+    return false;
   
+  } else if (!characterCollection.hasOwnProperty(character)) {
+    alert('We don\t have info on that character');
+    return false;
+    
+  } else {
+     
   // get character birthplace for use in Google Maps
   var characterPOB = characterCollection[character]['birthPlace']
   
   // get character id for use in Marvel API
   var characterID = characterCollection[character]['id']
 
-
+}
 
   
   // ===== MARVEL API =====
