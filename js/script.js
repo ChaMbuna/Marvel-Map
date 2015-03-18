@@ -73,29 +73,44 @@ function loadData() {
 
   
   // ===== MARVEL API =====
+  // stores the URL for the AJAX request
   var marvelAPIurl = 'http://gateway.marvel.com/v1/public/characters?id=' + CHARACTERID + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2';
-  var MarvelRequestTimeout = setTimeout(function() {
   
+  // Error handling in case Marvel API does not respond within 8 seconds
+  var MarvelRequestTimeout = setTimeout(function() {
+    // TODO: ADD ERROR MESSAGE
   }, 8000);
   
-  $.ajax({
-    url: marvelAPIurl,
-    dataType: 'json',
-    async: false,
-    success: function(object) {
-      console.log(object);
-      if (object.data.results[0].description === "") {
-        CHARACTERDESC = "Bummer, there is no description available for this character.";
-      } else {
-        CHARACTERDESC = object.data.results[0].description;
-      }
-      CHARACTERWIKI = object.data.results[0].urls[1].url;
-      CHARACTERNAME = object.data.results[0].name;
-      CHARACTERPIC = object.data.results[0].thumbnail.path + '.' + object.data.results[0].thumbnail.extension;
-      clearTimeout(MarvelRequestTimeout);
+  // Performs AJAX request and stores results in global variables
+  var request = new XMLHttpRequest();
+  request.open("GET", marvelAPIurl, false); // TODO: make run asynchronously
+  request.onreadystatechange = function() {
+    
+    // error handling
+    if (request.readyState != 4 || request.status != 200) return;
+    
+    // convert string to JSON object & store data we want
+    var result = JSON.parse(request.response).data.results[0];
+    
+    // In case API did not provide character description
+    if (result.description === "") {
+      CHARACTERDESC = "Bummer, there is no description available for this character.";
+    } else {
+      CHARACTERDESC = result.description;
     }
-});
-
+    
+    CHARACTERWIKI = result.urls[1].url;
+    
+    CHARACTERNAME = result.name;
+    
+    CHARACTERPIC = result.thumbnail.path + '.' + result.thumbnail.extension;
+    
+    // Resets timeout function
+    clearTimeout(MarvelRequestTimeout);
+  };
+  request.send();
+  
+  
   
   // ===== GOOGLE MAPS GEOCODER =====
   geocoder = new google.maps.Geocoder();  
@@ -150,6 +165,7 @@ function loadData() {
 
 // loads main function on character lookup
 $('#form-container').submit(loadData);
+// document.getElementById('submit-btn').submit(loadData)
 
 
 
