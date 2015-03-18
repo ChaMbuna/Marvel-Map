@@ -164,8 +164,9 @@ function loadData() {
 }
 
 // loads main function on character lookup
-$('#form-container').submit(loadData);
-// document.getElementById('submit-btn').submit(loadData)
+// $('#form-container').submit(loadData);
+ clickContainer = document.getElementById('form-container');
+ clickContainer.addEventListener('submit', loadData());
 
 
 
