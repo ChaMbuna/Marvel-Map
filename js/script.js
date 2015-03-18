@@ -1,9 +1,11 @@
 // Declare global map variable
-var MAP
-var CHARACTERPIC
-var CHARACTERNAME
-var CHARACTERDESC
-var CHARACTERWIKI
+var MAP;
+var CHARACTERPIC;
+var CHARACTERNAME;
+var CHARACTERDESC;
+var CHARACTERWIKI;
+var CHARACTERID;
+var CHARACTERPOB;
 
 // Searchable Characters including info not available in Marvel API
 var characterCollection = {
@@ -23,7 +25,7 @@ var characterCollection = {
     "id": 1009718,
     "birthPlace": "Alberta, Canada"
      },
- "Captain America": {
+  "Captain America": {
     "id": 1009220,
     "birthPlace": "New York, New York"
      },
@@ -39,19 +41,19 @@ var characterCollection = {
     "id": 1009535,
     "birthPlace": "Germany"
      }
-}
+};
 
 
 
 // ===== MAIN FUNCTION =====
 function loadData() {
   // stores HTML elements to be updated on query
-  var $body = $('body');
+  //var body = document.getElementById;
   
   // get value of character lookup
-  var character = $('#character').val();
+  var character = document.getElementById('character').value;
     
-  if ($('#character').val() === "") {
+  if (character === "") {
     alert('You didn\'t enter a character name');
     return false;
   
@@ -62,19 +64,19 @@ function loadData() {
   } else {
      
   // get character birthplace for use in Google Maps
-  var characterPOB = characterCollection[character]['birthPlace']
+  CHARACTERPOB = characterCollection[character].birthPlace;
   
   // get character id for use in Marvel API
-  var characterID = characterCollection[character]['id']
+  CHARACTERID = characterCollection[character].id;
 
 }
 
   
   // ===== MARVEL API =====
-var marvelAPIurl = 'http://gateway.marvel.com/v1/public/characters?id=' + characterID + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2'
-var MarvelRequestTimeout = setTimeout(function() {
+  var marvelAPIurl = 'http://gateway.marvel.com/v1/public/characters?id=' + CHARACTERID + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2';
+  var MarvelRequestTimeout = setTimeout(function() {
   
-}, 8000);
+  }, 8000);
   
   $.ajax({
     url: marvelAPIurl,
@@ -82,35 +84,31 @@ var MarvelRequestTimeout = setTimeout(function() {
     async: false,
     success: function(object) {
       console.log(object);
-      if (object.data.results[0].description == "") {
-        CHARACTERDESC = "Bummer, there is no description available for this character."
+      if (object.data.results[0].description === "") {
+        CHARACTERDESC = "Bummer, there is no description available for this character.";
       } else {
         CHARACTERDESC = object.data.results[0].description;
       }
       CHARACTERWIKI = object.data.results[0].urls[1].url;
       CHARACTERNAME = object.data.results[0].name;
-      CHARACTERPIC = object.data.results[0].thumbnail.path
-      + '.'
-      + object.data.results[0].thumbnail.extension;
+      CHARACTERPIC = object.data.results[0].thumbnail.path + '.' + object.data.results[0].thumbnail.extension;
       clearTimeout(MarvelRequestTimeout);
     }
 });
-  
-  
-  
+
   
   // ===== GOOGLE MAPS GEOCODER =====
   geocoder = new google.maps.Geocoder();  
-  geocoder.geocode( { 'address': characterPOB }, function(results, status) {
+  geocoder.geocode( { 'address': CHARACTERPOB }, function(results, status) {
     if (status == google.maps.GeocoderStatus.OK) {
       
       MAP.setCenter(results[0].geometry.location);
       
       var image = {
-      url: CHARACTERPIC,
+        url: CHARACTERPIC,
         scaledSize: new google.maps.Size(100, 100),
         origin: new google.maps.Point(0, 0),
-        anchor: new google.maps.Point(50, -20),
+        anchor: new google.maps.Point(50, -20)
       };
       
       var marker = new google.maps.Marker({
@@ -148,7 +146,7 @@ var MarvelRequestTimeout = setTimeout(function() {
 
     return false;
    
-};
+}
 
 // loads main function on character lookup
 $('#form-container').submit(loadData);
