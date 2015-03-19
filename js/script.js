@@ -44,8 +44,6 @@ var characterCollection = {
 };
 
 
-clickContainer = document.getElementById('form-container');
-
 // ===== MAIN FUNCTION =====
 function loadData() {
     // stores HTML elements to be updated on query
@@ -171,8 +169,9 @@ function loadData() {
 }
 
 // loads main function on character lookup
-$('#form-container').submit(loadData);
-// clickContainer.addEventListener('submit', loadData);
+// $('#form-container').submit(loadData);
+var clickButton = document.getElementById('form-container');
+clickButton.addEventListener('submit', loadData);
 
 
 // ===== GOOGLE MAPS API=====
