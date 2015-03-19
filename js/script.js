@@ -1,83 +1,49 @@
 // Declare global map variable
 var MAP;
-var CHARACTERPIC;
-var CHARACTERNAME;
-var CHARACTERDESC;
-var CHARACTERWIKI;
-var CHARACTERID;
-var CHARACTERPOB;
 
-// Searchable Characters including info not available in Marvel API
-var characterCollection = {
-    "3-D Man": {
-        "id": 1011334,
-        "birthPlace": "Los Angeles, California"
-    },
-    "Spider-Man": {
-        "id": 1009610,
-        "birthPlace": "Forest Hills, New York"
-    },
-    "Iron Man": {
-        "id": 1009368,
-        "birthPlace": "Long Island, New York"
-    },
-    "Wolverine": {
-        "id": 1009718,
-        "birthPlace": "Alberta, Canada"
-    },
-    "Captain America": {
-        "id": 1009220,
-        "birthPlace": "New York, New York"
-    },
-    "Hulk": {
-        "id": 1009351,
-        "birthPlace": "Dayton, Ohio"
-    },
-    "Black Widow": {
-        "id": 1009189,
-        "birthPlace": "Stalingrad, Russia"
-    },
-    "Red Skull": {
-        "id": 1009535,
-        "birthPlace": "Germany"
-    }
-};
+// Combined object with local and response data on current character
+var currentCharacter = {};
 
+var characters = ko.observableArray([
+        { name: 'Iron Man', id: 1009368, birthPlace: 'Long Island, New York'},
+        { name: 'Wolverine', id: 1009718, birthPlace: 'Alberta, Canada'},
+        { name: 'Spider-Man', id: 1009610, birthPlace: 'Forest Hills, New York'},
+        { name: '3-D Man', id: 1011334, birthPlace: 'Los Angeles, California'},
+        { name: 'Captain America', id: 1009220, birthPlace: 'New York, New York'},
+        { name: 'Hulk', id: 1009220, birthPlace: 'Dayton, Ohio'},
+        { name: 'Black Widow', id: 1009189, birthPlace: 'Stalingrad, Russia'},
+        { name: 'Red Skull', id: 1009535, birthPlace: 'Germany'}
+    ]);
+
+ko.applyBindings(characters);
 
 // ===== MAIN FUNCTION =====
 function loadData() {
-    // stores HTML elements to be updated on query
-    //var body = document.getElementById;
-
+    
     // get value of character entered
     var character = document.getElementById('character').value;
-
+    
+    // stores an object with info from the ko.observable characters array
+    // stores null if character not found
+    var currentCharacter = ko.utils.arrayFirst(characters(), function(item) {
+    return item.name === character;
+    });
+    
     // if nothing was entered, thrown an alert and stop the function
     if (character === "") {
         alert('You didn\'t enter a character name');
         return false;
 
-        // if something was entered, check if we know the character
-        // if we don't, stop the function execution
-    } else if (!characterCollection.hasOwnProperty(character)) {
+    // if something was entered, check if we know the character
+    // if we don't, stop the function execution
+    } else if (currentCharacter === null) {
         alert('We don\t have info on that character');
         return false;
-
-        // in all other cases, get the data we stored locally
-    } else {
-
-        // get character birthplace for use in Google Maps
-        CHARACTERPOB = characterCollection[character].birthPlace;
-
-        // get character id for use in Marvel API
-        CHARACTERID = characterCollection[character].id;
-
     }
-
-
+        
     // ===== MARVEL API =====
-    // stores the URL for the AJAX request
-    var marvelAPIurl = 'http://gateway.marvel.com/v1/public/characters?id=' + CHARACTERID + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2';
+    // stores the URL for the AJAX request        
+    var marvelAPIurl = 'http://gateway.marvel.com/v1/public/characters?id=' + currentCharacter.id + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2';
 
     // Error handling in case Marvel API does not respond within 8 seconds
     var MarvelRequestTimeout = setTimeout(function () {
@@ -94,38 +60,36 @@ function loadData() {
 
         // convert string to JSON object & store data we want
         var result = JSON.parse(request.response).data.results[0];
-
+        
         // In case API did not provide character description
         if (result.description === "") {
-            CHARACTERDESC = "Bummer, there is no description available for this character.";
+            currentCharacter.description = "Bummer, there is no description available for this character.";
         } else {
-            CHARACTERDESC = result.description;
+            currentCharacter.description = result.description;
         }
 
-        CHARACTERWIKI = result.urls[1].url;
+        currentCharacter.wiki = result.urls[1].url;
 
-        CHARACTERNAME = result.name;
-
-        CHARACTERPIC = result.thumbnail.path + '.' + result.thumbnail.extension;
-
+        currentCharacter.pic = result.thumbnail.path + '.' + result.thumbnail.extension;
+        
         // Resets timeout function
         clearTimeout(MarvelRequestTimeout);
     };
+    
     request.send();
-
 
 
     // ===== GOOGLE MAPS GEOCODER =====
     geocoder = new google.maps.Geocoder();
     geocoder.geocode({
-        'address': CHARACTERPOB
+        'address': currentCharacter.birthPlace
     }, function (results, status) {
         if (status == google.maps.GeocoderStatus.OK) {
 
             MAP.setCenter(results[0].geometry.location);
 
             var image = {
-                url: CHARACTERPIC,
+                url: currentCharacter.pic,
                 scaledSize: new google.maps.Size(100, 100),
                 origin: new google.maps.Point(0, 0),
                 anchor: new google.maps.Point(50, -20)
@@ -138,12 +102,11 @@ function loadData() {
             });
 
             var contentString = '<div id="content">' +
-                '<div id="siteNotice">' +
-                '</div>' +
-                '<h1 id="firstHeading" class="firstHeading">' + CHARACTERNAME + '</h1>' +
-                '<div id="bodyContent">' +
-                '<p><b>' + CHARACTERDESC + '</b></p>' +
-                '<p><a href="' + CHARACTERWIKI + '">' +
+                '<h1 id="popupName">' + currentCharacter.name + '</h1>' +
+                '<div id="popupBody">' +
+                '<p id="popupPOB">Born in ' + currentCharacter.birthPlace + '</p>' +
+                '<p>' + currentCharacter.description + '</p>' +
+                '<p id="popupWiki"><a href="' + currentCharacter.wiki + '">' +
                 'Check out this character on the Marvel Universe Wikipedia</a></p>' +
                 '</div>' +
                 '</div>';
@@ -169,9 +132,9 @@ function loadData() {
 }
 
 // loads main function on character lookup
-// $('#form-container').submit(loadData);
-var clickButton = document.getElementById('form-container');
-clickButton.addEventListener('submit', loadData);
+$('#form-container').submit(loadData);
+// var clickButton = document.getElementById('form-container');
+// clickButton.addEventListener.on('submit', loadData);
 
 
 // ===== GOOGLE MAPS API=====

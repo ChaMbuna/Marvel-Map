@@ -1,29 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <title>Simple Map</title>
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link href='http://fonts.googleapis.com/css?family=Russo+One' rel='stylesheet' type='text/css'>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-  </head>
-  <body>
-    <div id="container">
-      <div id="titlebar">Find out where Marvel heroes are born!</div>
-      <div id="header">  
-        <form id="form-container">
-          <input type="text" id="character" value="" placeholder="What character do you want to look up?">
-          <input type="submit" id="submit-btn" value="Search"></input>
-        </form>
-      </div>
+</head>
 
-    <div id="map-canvas"></div>
+<body>
+    <div id="container">
+        <div id="menubox">
+        <div id="titlebar">Find out where Marvel heroes are born!</div>
+            <div id="menu">
+                <img src="img/menuButton.png">
+            </div>
+        
+            <form id="form-container">
+                <input type="text" id="character" value="" placeholder="What character do you want to look up?">
+                <input type="submit" id="submit-btn" value="Search"></input>
+            </form>
+        </div>
+
+        <div id="map-canvas"></div>
+
+    </div>
     
-</div>
-  <script src="js/libs/jquery.min.js"></script>
-  <script src="js/libs/knockout-3.3.0.js"></script>
-  <script src="js/script.js"></script>
-  
-  
+    <div class="hidden" id="flyout-menu">
+    <ul data-bind="foreach: characters">
+        <li data-bind="text: name"></li>
+    </ul>
+    </div>
+    
+    <script src="js/libs/jquery.min.js"></script>
+    <script src="js/libs/knockout-3.3.0.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/menufunctions.js"></script>
+
+
+
 </body>
+
 </html>
