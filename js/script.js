@@ -17,34 +17,9 @@ var characters = ko.observableArray([
 
 ko.applyBindings(characters);
 
-// ===== MAIN FUNCTION =====
-function loadData() {
+function getMarvelData(marvelAPIurl) {
+        // ===== MARVEL API =====
     
-    // get value of character entered
-    var character = document.getElementById('character').value;
-    
-    // stores an object with info from the ko.observable characters array
-    // stores null if character not found
-    var currentCharacter = ko.utils.arrayFirst(characters(), function(item) {
-    return item.name === character;
-    });
-    
-    // if nothing was entered, thrown an alert and stop the function
-    if (character === "") {
-        alert('You didn\'t enter a character name');
-        return false;
-
-    // if something was entered, check if we know the character
-    // if we don't, stop the function execution
-    } else if (currentCharacter === null) {
-        alert('We don\t have info on that character');
-        return false;
-    }
-        
-    // ===== MARVEL API =====
-    // stores the URL for the AJAX request        
-    var marvelAPIurl = 'http://gateway.marvel.com/v1/public/characters?id=' + currentCharacter.id + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2';
-
     // Error handling in case Marvel API does not respond within 8 seconds
     var MarvelRequestTimeout = setTimeout(function () {
         // TODO: ADD ERROR MESSAGE
@@ -52,7 +27,7 @@ function loadData() {
 
     // Performs AJAX request and stores results in global variables
     var request = new XMLHttpRequest();
-    request.open("GET", marvelAPIurl, false); // TODO: make run asynchronously
+    request.open("GET", marvelAPIurl, true); // TODO: make run asynchronously
     request.onreadystatechange = function () {
 
         // error handling
@@ -77,6 +52,34 @@ function loadData() {
     };
     
     request.send();
+}
+
+// ===== MAIN FUNCTION =====
+function loadData(callback) {
+    
+    // get value of character entered
+    var character = document.getElementById('character').value;
+    
+    // stores an object with info from the ko.observable characters array
+    // stores null if character not found
+    var currentCharacter = ko.utils.arrayFirst(characters(), function(item) {
+    return item.name === character;
+    });
+    
+    // if nothing was entered, thrown an alert and stop the function
+    if (character === "") {
+        alert('You didn\'t enter a character name');
+        return false;
+
+    // if something was entered, check if we know the character
+    // if we don't, stop the function execution
+    } else if (currentCharacter === null) {
+        alert('We don\t have info on that character');
+        return false;
+    }
+    
+    // stores the URL for the AJAX request        
+    callback('http://gateway.marvel.com/v1/public/characters?id=' + currentCharacter.id + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2');
 
 
     // ===== GOOGLE MAPS GEOCODER =====
@@ -131,8 +134,8 @@ function loadData() {
 
 }
 
-// loads main function on character lookup
-$('#form-container').submit(loadData);
+// loads character lookup function on form submit
+$('#form-container').submit(loadData(getMarvelData));
 // var clickButton = document.getElementById('form-container');
 // clickButton.addEventListener.on('submit', loadData);
 
