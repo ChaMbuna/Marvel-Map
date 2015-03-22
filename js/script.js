@@ -17,51 +17,65 @@ var characters = ko.observableArray([
 
 ko.applyBindings(characters);
 
-function getMarvelData(marvelAPIurl) {
-        // ===== MARVEL API =====
-    
-    // Error handling in case Marvel API does not respond within 8 seconds
-    var MarvelRequestTimeout = setTimeout(function () {
-        // TODO: ADD ERROR MESSAGE
-    }, 8000);
+function getMarvelData(loadData(currentCharacter) {
+        // ===== GOOGLE MAPS GEOCODER =====
+    geocoder = new google.maps.Geocoder();
+    geocoder.geocode({
+        'address': currentCharacter.birthPlace
+    }, function (results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
 
-    // Performs AJAX request and stores results in global variables
-    var request = new XMLHttpRequest();
-    request.open("GET", marvelAPIurl, true); // TODO: make run asynchronously
-    request.onreadystatechange = function () {
+            MAP.setCenter(results[0].geometry.location);
 
-        // error handling
-        if (request.readyState != 4 || request.status != 200) return;
+            var image = {
+                url: currentCharacter.pic,
+                scaledSize: new google.maps.Size(100, 100),
+                origin: new google.maps.Point(0, 0),
+                anchor: new google.maps.Point(50, -20)
+            };
 
-        // convert string to JSON object & store data we want
-        var result = JSON.parse(request.response).data.results[0];
-        
-        // In case API did not provide character description
-        if (result.description === "") {
-            currentCharacter.description = "Bummer, there is no description available for this character.";
+            var marker = new google.maps.Marker({
+                position: results[0].geometry.location,
+                map: MAP,
+                icon: image,
+            });
+
+            var contentString = '<div id="content">' +
+                '<h1 id="popupName">' + currentCharacter.name + '</h1>' +
+                '<div id="popupBody">' +
+                '<p id="popupPOB">Born in ' + currentCharacter.birthPlace + '</p>' +
+                '<p>' + currentCharacter.description + '</p>' +
+                '<p id="popupWiki"><a href="' + currentCharacter.wiki + '">' +
+                'Check out this character on the Marvel Universe Wikipedia</a></p>' +
+                '</div>' +
+                '</div>';
+
+            var infowindow = new google.maps.InfoWindow({
+                content: contentString
+            });
+
+            google.maps.event.addListener(marker, 'click', function () {
+                infowindow.open(MAP, marker);
+            });
+
         } else {
-            currentCharacter.description = result.description;
+            alert('Geocode was not successful for the following reason: ' + status);
         }
+    });
 
-        currentCharacter.wiki = result.urls[1].url;
 
-        currentCharacter.pic = result.thumbnail.path + '.' + result.thumbnail.extension;
-        
-        // Resets timeout function
-        clearTimeout(MarvelRequestTimeout);
-    };
+
+
+    return false;
+
+}) {
     
-    request.send();
-}
-
-// ===== MAIN FUNCTION =====
-function loadData(callback) {
+    // ===== first we gather local data for the character =====
     
     // get value of character entered
     var character = document.getElementById('character').value;
     
-    // stores an object with info from the ko.observable characters array
-    // stores null if character not found
+    // fills currentCharacter object with info from the ko.observable characters array; stores null if character is not found
     var currentCharacter = ko.utils.arrayFirst(characters(), function(item) {
     return item.name === character;
     });
@@ -77,10 +91,51 @@ function loadData(callback) {
         alert('We don\t have info on that character');
         return false;
     }
+        
+    // ===== Now we deal with the Marvel API =====
     
-    // stores the URL for the AJAX request        
-    callback('http://gateway.marvel.com/v1/public/characters?id=' + currentCharacter.id + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2');
+    // first we get the url for the AJAX request
+    var MarvelAPIurl = 'http://gateway.marvel.com/v1/public/characters?id=' + currentCharacter.id + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2'
+    
+    // error handling in case Marvel API does not respond within 8 seconds
+    var MarvelRequestTimeout = setTimeout(function () {
+        // TODO: ADD ERROR MESSAGE
+    }, 8000);
 
+    // perform AJAX request and store results in currentCharacter object
+    var request = new XMLHttpRequest();
+    request.open("GET", marvelAPIurl, true); // TODO: make run asynchronously
+    request.onreadystatechange = function () {
+
+        // error handling
+        if (request.readyState != 4 || request.status != 200) return;
+
+        // convert string to JSON object & store data object we need
+        var result = JSON.parse(request.response).data.results[0];
+        
+        // error handling when API did not provide character description
+        if (result.description === "") {
+            currentCharacter.description = "Bummer, there is no description available for this character.";
+        } else {
+            currentCharacter.description = result.description;
+        }
+        
+        // stores the marvel universe wiki link for this character
+        currentCharacter.wiki = result.urls[1].url;
+
+        // stores the url of the picture for this character
+        currentCharacter.pic = result.thumbnail.path + '.' + result.thumbnail.extension;
+        
+        // resets timeout function
+        clearTimeout(MarvelRequestTimeout);
+    };
+    
+    request.send();
+}
+
+// ===== MAIN FUNCTION =====
+function loadData(currentCharacter) {
+    
 
     // ===== GOOGLE MAPS GEOCODER =====
     geocoder = new google.maps.Geocoder();
@@ -135,7 +190,7 @@ function loadData(callback) {
 }
 
 // loads character lookup function on form submit
-$('#form-container').submit(loadData(getMarvelData));
+$('#form-container').submit(getMarvelData);
 // var clickButton = document.getElementById('form-container');
 // clickButton.addEventListener.on('submit', loadData);
 
