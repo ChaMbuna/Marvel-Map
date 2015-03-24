@@ -41,7 +41,7 @@ function loadData() {
         return false;
     }
         
-    // ===== Now we deal with the Marvel API =====
+    console.log(currentCharacter);
     
 }
 
@@ -49,10 +49,10 @@ function loadData() {
 function getMarvelData(loadData) {
     
     // callback to get local data
-    loadData()
+    loadData();
     
     // first we get the url for the AJAX request
-    var MarvelAPIurl = 'http://gateway.marvel.com/v1/public/characters?id=' + currentCharacter.id + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2'
+    var marvelAPIurl = 'http://gateway.marvel.com/v1/public/characters?id=' + currentCharacter.id + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2'
     
     // error handling in case Marvel API does not respond within 8 seconds
     var MarvelRequestTimeout = setTimeout(function () {
