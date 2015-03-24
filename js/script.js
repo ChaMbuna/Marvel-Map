@@ -19,7 +19,7 @@ var characters = ko.observableArray([
 ko.applyBindings(characters);
 
 // Gather character info stored locally
-function loadData(getMarvelData) {
+function loadData() {
     
     // get value of character entered
     var character = document.getElementById('character').value;
@@ -42,11 +42,6 @@ function loadData(getMarvelData) {
     }
     console.log(currentCharacter);
     alert('test');
-    getMarvelData();
-}
-
-// Get character info from Marvel
-function getMarvelData(getGoogleMap) {
     
     // first we get the url for the AJAX request
     var marvelAPIurl = 'http://gateway.marvel.com/v1/public/characters?id=' + currentCharacter.id + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2'
@@ -82,16 +77,21 @@ function getMarvelData(getGoogleMap) {
         
         // resets timeout function
         clearTimeout(MarvelRequestTimeout);
+        
+        // calls Google maps function
+        console.log(currentCharacter);
+        alert('test ');
+        getGoogleMap();
     };
     
     request.send();
     console.log(currentCharacter);
-    alert('test');
-    getGoogleMap();
+    
 }
 
 
-// Update the map
+// updates the map
+// called after ajax request is successful
 function getGoogleMap() {
     
     // ===== GOOGLE MAPS GEOCODER =====
@@ -285,5 +285,4 @@ function loadScript() {
     document.body.appendChild(script);
 }
 
-// Loads initial Google Map when page loads
 window.onload = loadScript;
