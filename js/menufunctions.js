@@ -1,3 +1,4 @@
+// flyout list menu
 document.getElementById('menu').onclick = function() {
     
     var flyOut = document.getElementById('flyout-menu');
