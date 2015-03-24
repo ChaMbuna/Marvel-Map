@@ -3,7 +3,7 @@ var MAP;
 
 // Object to store local and AJAX response data on current character
 var currentCharacter = {};
-
+var character = "";
 // Array with character objects
 var characters = ko.observableArray([
         { name: 'Iron Man', id: 1009368, birthPlace: 'Long Island, New York'},
@@ -20,10 +20,7 @@ ko.applyBindings(characters);
 
 // Gather character info stored locally
 function loadData() {
-    
-    // get value of character entered
-    var character = document.getElementById('character').value;
-    
+        
     // fills currentCharacter object with info from the ko.observable characters array; stores null if character is not found
     currentCharacter = ko.utils.arrayFirst(characters(), function(item) {
     return item.name === character;
@@ -142,6 +139,28 @@ function getGoogleMap() {
     });
 }
 
+// View functions for user interaction
+
+
 // loads character lookup function on form submit
 var clickButton = document.getElementById('form-container');
-clickButton.addEventListener('submit', loadData);
+
+// resets the currentCharacter and starts loadData;
+clickButton.addEventListener('submit', lookup);
+
+// look up character on click from list
+function clickedList() {
+    currentCharacter = {};
+    character = this.name;
+    console.log(character);
+    loadData();
+}
+
+// empty current character object & sets character
+function lookup() {
+    currentCharacter = {};
+    // get value of character entered in search
+    character = document.getElementById('character').value;
+    console.log(character);
+    loadData();
+}

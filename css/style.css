@@ -100,12 +100,21 @@ li {
 
 #flyout-menu {
     width: 100%;
-    background-color: rgba(255,0,255,0.8);
+    background-color: rgba(2,2,2,0.8);
     position: absolute;
     top: 88px;
     left: 0;
     z-index: 10;
 }
+
+#flyout-menu li {
+    cursor: pointer;
+}
+
+#flyout-menu li:hover {
+    background-color: darkgoldenrod;
+}
+
 
 .hidden {
     display: none;
