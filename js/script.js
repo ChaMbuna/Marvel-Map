@@ -52,7 +52,7 @@ function loadData() {
 
     // perform AJAX request and store results in currentCharacter object
     var request = new XMLHttpRequest();
-    request.open("GET", marvelAPIurl, false); // TODO: make run asynchronously
+    request.open("GET", marvelAPIurl, true); // TODO: make run asynchronously
     request.onreadystatechange = function () {
 
         // error handling
