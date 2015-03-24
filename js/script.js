@@ -25,7 +25,7 @@ function loadData() {
     var character = document.getElementById('character').value;
     
     // fills currentCharacter object with info from the ko.observable characters array; stores null if character is not found
-    var currentCharacter = ko.utils.arrayFirst(characters(), function(item) {
+    currentCharacter = ko.utils.arrayFirst(characters(), function(item) {
     return item.name === character;
     });
     
@@ -40,11 +40,9 @@ function loadData() {
         alert('We don\t have info on that character');
         return false;
     }
-    console.log(currentCharacter);
-    alert('test');
     
     // first we get the url for the AJAX request
-    var marvelAPIurl = 'http://gateway.marvel.com/v1/public/characters?id=' + currentCharacter.id + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2'
+    var marvelAPIurl = 'http://gateway.marvel.com/v1/public/characters?id=' + currentCharacter.id + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2';
     
     // error handling in case Marvel API does not respond within 8 seconds
     var MarvelRequestTimeout = setTimeout(function () {
@@ -80,36 +78,35 @@ function loadData() {
         
         // calls Google maps function
         console.log(currentCharacter);
-        alert('test ');
+        alert('check console');
+    
         getGoogleMap();
     };
     
     request.send();
-    console.log(currentCharacter);
     
 }
-
 
 // updates the map
 // called after ajax request is successful
 function getGoogleMap() {
+    console.log(currentCharacter.birthPlace);
+        alert('check console again');
     
-    // ===== GOOGLE MAPS GEOCODER =====
     geocoder = new google.maps.Geocoder();
-    geocoder.geocode({
-        'address': currentCharacter.birthPlace
-    }, function (results, status) {
+    geocoder.geocode({ 'address': currentCharacter.birthPlace }, function (results, status) {
         if (status == google.maps.GeocoderStatus.OK) {
 
             MAP.setCenter(results[0].geometry.location);
 
+            // stores image that replaces default google maps marker
             var image = {
                 url: currentCharacter.pic,
                 scaledSize: new google.maps.Size(100, 100),
                 origin: new google.maps.Point(0, 0),
                 anchor: new google.maps.Point(50, -20)
             };
-
+            
             var marker = new google.maps.Marker({
                 position: results[0].geometry.location,
                 map: MAP,
@@ -138,16 +135,11 @@ function getGoogleMap() {
             alert('Geocode was not successful for the following reason: ' + status);
         }
     });
-
-
-    return false;
-
 }
 
 // loads character lookup function on form submit
-$('#form-container').submit(loadData);
-// var clickButton = document.getElementById('form-container');
-// clickButton.addEventListener.on('submit', loadData);
+var clickButton = document.getElementById('form-container');
+clickButton.addEventListener('submit', loadData);
 
 
 // ===== GOOGLE MAPS API=====
