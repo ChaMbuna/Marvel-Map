@@ -19,7 +19,7 @@ var characters = ko.observableArray([
 ko.applyBindings(characters);
 
 // Gather character info stored locally
-function loadData() {
+function loadData(getMarvelData) {
     
     // get value of character entered
     var character = document.getElementById('character').value;
@@ -40,16 +40,13 @@ function loadData() {
         alert('We don\t have info on that character');
         return false;
     }
-        
     console.log(currentCharacter);
-    
+    alert('test');
+    getMarvelData();
 }
 
 // Get character info from Marvel
-function getMarvelData(loadData) {
-    
-    // callback to get local data
-    loadData();
+function getMarvelData(getGoogleMap) {
     
     // first we get the url for the AJAX request
     var marvelAPIurl = 'http://gateway.marvel.com/v1/public/characters?id=' + currentCharacter.id + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2'
@@ -88,14 +85,14 @@ function getMarvelData(loadData) {
     };
     
     request.send();
+    console.log(currentCharacter);
+    alert('test');
+    getGoogleMap();
 }
 
 
-// Build the map
-function getGoogleMap(getMarvelData) {
-    
-    // callback to get Marvel data
-    getMarvelData();
+// Update the map
+function getGoogleMap() {
     
     // ===== GOOGLE MAPS GEOCODER =====
     geocoder = new google.maps.Geocoder();
@@ -148,7 +145,7 @@ function getGoogleMap(getMarvelData) {
 }
 
 // loads character lookup function on form submit
-$('#form-container').submit(getGoogleMap);
+$('#form-container').submit(loadData);
 // var clickButton = document.getElementById('form-container');
 // clickButton.addEventListener.on('submit', loadData);
 
