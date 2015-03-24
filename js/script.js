@@ -4,6 +4,7 @@ var MAP;
 // Combined object with local and response data on current character
 var currentCharacter = {};
 
+// Array with character objects
 var characters = ko.observableArray([
         { name: 'Iron Man', id: 1009368, birthPlace: 'Long Island, New York'},
         { name: 'Wolverine', id: 1009718, birthPlace: 'Alberta, Canada'},
@@ -17,60 +18,8 @@ var characters = ko.observableArray([
 
 ko.applyBindings(characters);
 
-function getMarvelData(loadData(currentCharacter) {
-        // ===== GOOGLE MAPS GEOCODER =====
-    geocoder = new google.maps.Geocoder();
-    geocoder.geocode({
-        'address': currentCharacter.birthPlace
-    }, function (results, status) {
-        if (status == google.maps.GeocoderStatus.OK) {
-
-            MAP.setCenter(results[0].geometry.location);
-
-            var image = {
-                url: currentCharacter.pic,
-                scaledSize: new google.maps.Size(100, 100),
-                origin: new google.maps.Point(0, 0),
-                anchor: new google.maps.Point(50, -20)
-            };
-
-            var marker = new google.maps.Marker({
-                position: results[0].geometry.location,
-                map: MAP,
-                icon: image,
-            });
-
-            var contentString = '<div id="content">' +
-                '<h1 id="popupName">' + currentCharacter.name + '</h1>' +
-                '<div id="popupBody">' +
-                '<p id="popupPOB">Born in ' + currentCharacter.birthPlace + '</p>' +
-                '<p>' + currentCharacter.description + '</p>' +
-                '<p id="popupWiki"><a href="' + currentCharacter.wiki + '">' +
-                'Check out this character on the Marvel Universe Wikipedia</a></p>' +
-                '</div>' +
-                '</div>';
-
-            var infowindow = new google.maps.InfoWindow({
-                content: contentString
-            });
-
-            google.maps.event.addListener(marker, 'click', function () {
-                infowindow.open(MAP, marker);
-            });
-
-        } else {
-            alert('Geocode was not successful for the following reason: ' + status);
-        }
-    });
-
-
-
-
-    return false;
-
-}) {
-    
-    // ===== first we gather local data for the character =====
+// Gather character info stored locally
+function loadData() {
     
     // get value of character entered
     var character = document.getElementById('character').value;
@@ -94,6 +43,14 @@ function getMarvelData(loadData(currentCharacter) {
         
     // ===== Now we deal with the Marvel API =====
     
+}
+
+// Get character info from Marvel
+function getMarvelData(loadData) {
+    
+    // callback to get local data
+    loadData()
+    
     // first we get the url for the AJAX request
     var MarvelAPIurl = 'http://gateway.marvel.com/v1/public/characters?id=' + currentCharacter.id + '&ts=1&apikey=e0fb310884d9d2f6becaacb508f3b69f&hash=3ad897582261676d9a57067e959bc2d2'
     
@@ -104,7 +61,7 @@ function getMarvelData(loadData(currentCharacter) {
 
     // perform AJAX request and store results in currentCharacter object
     var request = new XMLHttpRequest();
-    request.open("GET", marvelAPIurl, true); // TODO: make run asynchronously
+    request.open("GET", marvelAPIurl, false); // TODO: make run asynchronously
     request.onreadystatechange = function () {
 
         // error handling
@@ -133,10 +90,13 @@ function getMarvelData(loadData(currentCharacter) {
     request.send();
 }
 
-// ===== MAIN FUNCTION =====
-function loadData(currentCharacter) {
-    
 
+// Build the map
+function getGoogleMap(getMarvelData) {
+    
+    // callback to get Marvel data
+    getMarvelData();
+    
     // ===== GOOGLE MAPS GEOCODER =====
     geocoder = new google.maps.Geocoder();
     geocoder.geocode({
@@ -183,14 +143,12 @@ function loadData(currentCharacter) {
     });
 
 
-
-
     return false;
 
 }
 
 // loads character lookup function on form submit
-$('#form-container').submit(getMarvelData);
+$('#form-container').submit(getGoogleMap);
 // var clickButton = document.getElementById('form-container');
 // clickButton.addEventListener.on('submit', loadData);
 
@@ -296,7 +254,7 @@ var styles = [
   }
 ];
 
-// Initializes Google Maps
+// setup & customize Google Maps
 function initialize() {
     var styledMap = new google.maps.StyledMapType(styles, {
         name: "Styled Map"
@@ -321,8 +279,7 @@ function initialize() {
 }
 
 
-
-// Loads Google Maps API asynchronously
+// load Google map on page load
 function loadScript() {
     var script = document.createElement('script');
     script.type = 'text/javascript';
