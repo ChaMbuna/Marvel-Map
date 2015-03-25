@@ -145,7 +145,8 @@ function clickedList() {
 }
 
 // empty current character object & sets character
-function lookup() {
+function lookup(event) {
+    event.preventDefault()
     character = document.getElementById('character').value;
         
     // if nothing was entered, thrown an alert and stop the function
