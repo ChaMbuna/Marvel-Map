@@ -1,6 +1,3 @@
-// Declare global map variable
-var MAP;
-
 // Object to store local and AJAX response data on current character
 var currentCharacter = {};
 var character = "";
@@ -11,7 +8,7 @@ var characters = ko.observableArray([
         { name: 'Spider-Man', id: 1009610, birthPlace: 'Forest Hills, New York'},
         { name: '3-D Man', id: 1011334, birthPlace: 'Los Angeles, California'},
         { name: 'Captain America', id: 1009220, birthPlace: 'New York, New York'},
-        { name: 'Hulk', id: 1009220, birthPlace: 'Dayton, Ohio'},
+        { name: 'Hulk', id: 1009351, birthPlace: 'Dayton, Ohio'},
         { name: 'Black Widow', id: 1009189, birthPlace: 'Stalingrad, Russia'},
         { name: 'Red Skull', id: 1009535, birthPlace: 'Germany'}
     ]);
@@ -26,17 +23,7 @@ function loadData() {
     return item.name === character;
     });
     
-    // if nothing was entered, thrown an alert and stop the function
-    if (character === "") {
-        alert('You didn\'t enter a character name');
-        return false;
-
-    // if something was entered, check if we know the character
-    // if we don't, stop the function execution
-    } else if (currentCharacter === null) {
-        alert('We don\t have info on that character');
-        return false;
-    }
+    
     
     
     // Marvel API handling
@@ -47,56 +34,53 @@ function loadData() {
     
     // error handling in case Marvel API does not respond within 8 seconds
     var MarvelRequestTimeout = setTimeout(function () {
-        // TODO: ADD ERROR MESSAGE
+        return alert('The Marvel API is not available right now');
     }, 8000);
 
     // perform AJAX request and store results in currentCharacter object
     var request = new XMLHttpRequest();
-    request.open("GET", marvelAPIurl, true); // TODO: make run asynchronously
+    request.open("GET", marvelAPIurl, true);
     request.onreadystatechange = function () {
 
-        // error handling
-        if (request.readyState != 4 || request.status != 200) return alert('Google Maps is not available right now');
+            // error handling
+            if (request.readyState != 4 && request.status != 200) {
+                return alert('Google Maps is not available right now');
+            }
 
-        // convert string to JSON object & store data object we need
-        var result = JSON.parse(request.response).data.results[0];
-        
-        // error handling when API did not provide character description
-        if (result.description === "") {
-            currentCharacter.description = "Bummer, there is no description available for this character.";
-        } else {
-            currentCharacter.description = result.description;
-        }
-        
-        // stores the marvel universe wiki link for this character
-        currentCharacter.wiki = result.urls[1].url;
+            // convert string to JSON object & store data object we need
+            var result = JSON.parse(request.response).data.results[0];
 
-        // stores the url of the picture for this character
-        currentCharacter.pic = result.thumbnail.path + '.' + result.thumbnail.extension;
+            // error handling when API did not provide character description
+            if (result.description === "") {
+                currentCharacter.description = "Bummer, there is no description available for this character.";
+            } else {
+                currentCharacter.description = result.description;
+            }
+
+            // stores the marvel universe wiki link for this character
+            currentCharacter.wiki = result.urls[1].url;
+
+            // stores the url of the picture for this character
+            currentCharacter.pic = result.thumbnail.path + '.' + result.thumbnail.extension;
+
+            // resets timeout function
+            clearTimeout(MarvelRequestTimeout);
+
+            // calls Google maps function
+            getGoogleMap();
         
-        // resets timeout function
-        clearTimeout(MarvelRequestTimeout);
-        
-        console.log(currentCharacter);
-        alert('check console');
-        
-        // calls Google maps function
-        getGoogleMap();
-        
-    };
+        };
+
+        request.send();
     
-    request.send();
-    alert('did the map move?');
+    return false;
 }
 
 // updates the map
 // called after ajax request is successful
 function getGoogleMap() {
-    console.log(currentCharacter.birthPlace);
-        alert('check console again');
-    
-    geocoder = new google.maps.Geocoder();
-    geocoder.geocode( { 'address': currentCharacter.birthPlace }, function (results, status) {
+    var geocoder = new google.maps.Geocoder();
+    geocoder.geocode( { 'address': currentCharacter.birthPlace }, function(results, status) {
         if (status == google.maps.GeocoderStatus.OK) {
 
             MAP.setCenter(results[0].geometry.location);
@@ -150,17 +134,34 @@ clickButton.addEventListener('submit', lookup);
 
 // look up character on click from list
 function clickedList() {
+    
+    // clears currentCharacter object;
+   
     currentCharacter = {};
+    // get name for clicked character
     character = this.name;
-    console.log(character);
+    
     loadData();
 }
 
 // empty current character object & sets character
 function lookup() {
-    currentCharacter = {};
-    // get value of character entered in search
     character = document.getElementById('character').value;
-    console.log(character);
-    loadData();
+        
+    // if nothing was entered, thrown an alert and stop the function
+    if (character === "") {
+        alert('You didn\'t enter a character name');
+        return false;
+
+    // if something was entered, check if we know the character
+    // if we don't, stop the function execution
+    } else if (currentCharacter === null) {
+        alert('We don\t have info on that character');
+        return false;
+    } else {
+        // clears currentCharacter object;
+        currentCharacter = {};
+        // get value of character entered in search
+        loadData();
+        }
 }

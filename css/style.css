@@ -49,7 +49,7 @@ li {
 #menubox {
     padding: 10px;
     background-color: black;
-    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.9)), url('/img/background-pattern.jpg');
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.9)), url('../img/background-pattern.jpg');
 }
 
 #menu img {
@@ -65,7 +65,7 @@ li {
 
 #character {
     padding: 8px;
-    width: calc(100% - 158px);
+    width: calc(100% - 168px);
     opacity: 0.8;
     border: none;
 }

@@ -2,6 +2,10 @@
 Code to initialize Google Maps on page load
 
 */
+
+// global map variable
+var MAP;
+
 // Styles to make the map look Marvel themed
 var styles = [
     {
