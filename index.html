@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Simple Map</title>
+    <title>Marvel Origins</title>
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link href='http://fonts.googleapis.com/css?family=Russo+One' rel='stylesheet' type='text/css'>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
@@ -12,13 +12,13 @@
 <body>
     <div id="container">
         <div id="menubox">
-        <div id="titlebar">Find out where Marvel heroes are born!</div>
+        <div id="titlebar">Find out where Marvel heroes and villains are born!</div>
             <div id="menu">
                 <img src="img/menuButton.png">
             </div>
         
             <form id="form-container">
-                <input type="text" id="character" value="" placeholder="What character do you want to look up?">
+                <input type="text" id="character" value="" placeholder="Name of character">
                 <input type="submit" id="submit-btn" value="Search"></input>
             </form>
         </div>
@@ -33,12 +33,11 @@
     </ul>
     </div>
     
-    <script src="js/gmaps.init.js"></script>
+    <script src="js/gmaps.js"></script>
     <script src="js/libs/knockout-3.3.0.js"></script>
-    <script src="js/script.js"></script>
-    <script src="js/menufunctions.js"></script>
-
-
+    <script src="js/view.js"></script>
+    <script src="js/model.js"></script>
+    <script src="js/viewmodel.js"></script>
 
 </body>
 

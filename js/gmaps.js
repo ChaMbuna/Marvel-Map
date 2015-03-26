@@ -1,8 +1,3 @@
-/*
-Code to initialize Google Maps on page load
-
-*/
-
 // global map variable
 var MAP;
 
@@ -144,3 +139,50 @@ function loadScript() {
 }
 
 window.onload = loadScript;
+
+// updates the map
+// called after ajax request is successful
+function getGoogleMap() {
+    var geocoder = new google.maps.Geocoder();
+    geocoder.geocode( { 'address': currentCharacter.birthPlace }, function(results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+
+            MAP.setCenter(results[0].geometry.location);
+
+            // stores image that replaces default google maps marker
+            var image = {
+                url: currentCharacter.pic,
+                scaledSize: new google.maps.Size(100, 100),
+                origin: new google.maps.Point(0, 0),
+                anchor: new google.maps.Point(50, -20)
+            };
+            
+            var marker = new google.maps.Marker({
+                map: MAP,
+                position: results[0].geometry.location,
+                icon: image
+            });
+
+            var contentString = '<div id="content">' +
+                '<h1 id="popupName">' + currentCharacter.name + '</h1>' +
+                '<div id="popupBody">' +
+                '<p id="popupPOB">Born in ' + currentCharacter.birthPlace + '</p>' +
+                '<p>' + currentCharacter.description + '</p>' +
+                '<p id="popupWiki"><a href="' + currentCharacter.wiki + '">' +
+                'Check out this character on the Marvel Universe Wikipedia</a></p>' +
+                '</div>' +
+                '</div>';
+
+            var infowindow = new google.maps.InfoWindow({
+                content: contentString
+            });
+
+            google.maps.event.addListener(marker, 'click', function () {
+                infowindow.open(MAP, marker);
+            });
+
+        } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+        }
+    });
+}
