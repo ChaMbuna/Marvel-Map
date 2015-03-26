@@ -49,6 +49,9 @@ function clickedList() {
     currentCharacter = {};
     // get name for clicked character
     character = this.name;
+    // closes the flyout menu
+    var flyOut = document.getElementById('flyout-menu');
+    flyOut.className += ' hidden';
     // call function that talks to Marvel & Google
     loadData();
 }

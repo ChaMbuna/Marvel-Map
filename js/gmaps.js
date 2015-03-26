@@ -107,9 +107,9 @@ function initialize() {
         name: "Styled Map"
     });
     var mapOptions = {
-        zoom: 12,
+        zoom: 3,
         // Focus map on New York as initial view
-        center: new google.maps.LatLng(40.7033127, -73.979681),
+        center: new google.maps.LatLng(10, -100),
         mapTypeControlOptions: {
             mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
         },
@@ -124,21 +124,25 @@ function initialize() {
     
     // Sets the map type
     MAP.setMapTypeId('map_style');
-
-
 }
 
 
 // load Google map on page load
-function loadScript() {
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDrq2isM2im18Jccxs7-4g2O8l-93fqJZU' +
-        '&callback=initialize';
-    document.body.appendChild(script);
-}
+try {
+    function loadScript() {
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDrq2isM2im18Jccxs7-4g2O8l-93fqJZU' +
+            '&callback=initialize';
+        document.body.appendChild(script);
+    }
+    
+    window.onload = loadScript;
 
-window.onload = loadScript;
+    } catch (error) {
+        alert('Google Maps is not available right now');
+    }
+
 
 // updates the map
 // called after ajax request is successful
@@ -151,10 +155,10 @@ function getGoogleMap() {
 
             // stores image that replaces default google maps marker
             var image = {
-                url: currentCharacter.pic,
-                scaledSize: new google.maps.Size(100, 100),
+                url: '/img/marvel-mappin.png',
+                scaledSize: new google.maps.Size(50, 50),
                 origin: new google.maps.Point(0, 0),
-                anchor: new google.maps.Point(50, -20)
+                anchor: new google.maps.Point(20, 50)
             };
             
             var marker = new google.maps.Marker({
@@ -167,6 +171,7 @@ function getGoogleMap() {
                 '<h1 id="popupName">' + currentCharacter.name + '</h1>' +
                 '<div id="popupBody">' +
                 '<p id="popupPOB">Born in ' + currentCharacter.birthPlace + '</p>' +
+                '<img id="characterpic" src="' + currentCharacter.pic + '">' +
                 '<p>' + currentCharacter.description + '</p>' +
                 '<p id="popupWiki"><a href="' + currentCharacter.wiki + '">' +
                 'Check out this character on the Marvel Universe Wikipedia</a></p>' +
@@ -180,6 +185,9 @@ function getGoogleMap() {
             google.maps.event.addListener(marker, 'click', function () {
                 infowindow.open(MAP, marker);
             });
+            
+            if (results[0].geometry.viewport) 
+          MAP.fitBounds(results[0].geometry.viewport);
 
         } else {
             alert('Geocode was not successful for the following reason: ' + status);
