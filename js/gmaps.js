@@ -101,8 +101,40 @@ var styles = [
   }
 ];
 
+
+function setMarkers(map, characters) {
+  
+    var image = {
+      url: '/img/marvel-mappin.png',
+      scaledSize: new google.maps.Size(50, 50),
+      origin: new google.maps.Point(0, 0),
+      anchor: new google.maps.Point(20, 50)
+  };
+  
+    for (var i = 0; i < characters().length; i++) {
+    
+        var character = characters()[i];
+        
+        var myLatLng = new google.maps.LatLng(character.lat, character.lng);
+        
+        var marker = new google.maps.Marker({
+            position: myLatLng,
+            map: MAP,
+            icon: image
+        });
+    
+        google.maps.event.addListener(marker, 'click', function () {
+                var lf = (marker.position);
+                console.log(lf.k);
+                console.log(lf.D);
+        });
+    }
+    
+}
+
 // setup & customize Google Maps
 function initialize() {
+        
     var styledMap = new google.maps.StyledMapType(styles, {
         name: "Styled Map"
     });
@@ -124,6 +156,8 @@ function initialize() {
     
     // Sets the map type
     MAP.setMapTypeId('map_style');
+    
+    setMarkers(MAP, characters);
 }
 
 
@@ -138,7 +172,8 @@ try {
     }
     
     window.onload = loadScript;
-
+    
+    // error handling for google maps server errors
     } catch (error) {
         alert('Google Maps is not available right now');
     }
